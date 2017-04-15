@@ -35,15 +35,7 @@
     var canvas = document.getElementById("main_canvas");
     document.body.style.backgroundColor = "#000";
     var ctx = canvas.getContext("2d");
-
-    var earthImage = new Image();
-    earthImage.src = "earth.png";
-
-    var EARTH_RADIUS = 150;
-
-    var sunImage = new Image();
-    sunImage.src = "sun.png";
-
+    
     var SUN_RADIUS = 30;
     var SUN_DISTANCE = 500;
     var sunAngle = 0;
@@ -300,19 +292,6 @@
     }
 
 
-    earthImage.addEventListener("load", function (event) {
-        unloadedElements -= 1;
-        if (unloadedElements <= 0) {
-            update();
-        }
-    }, false);
-
-    sunImage.addEventListener("load", function (event) {
-        unloadedElements -= 1;
-        if (unloadedElements <= 0) {
-            update();
-        }
-    }, false);
 
     for (var i = 0; i < areas_length; i++) {
         var icon = new Image();
