@@ -426,18 +426,14 @@
                 SUN_RADIUS * 2,
                 SUN_RADIUS * 2);*/
 
-        var grd = ctx.createRadialGradient(0,0,25,0,0,800);
+        var grd = ctx.createRadialGradient(0,0,25,0,0,600);
         grd.addColorStop(0, "rgba(252,212,100,1)");
-        grd.addColorStop(.2, "rgba(252,212,64,.8)");
-        grd.addColorStop(.4, "rgba(252,212,64,.6)");
-        grd.addColorStop(.6, "rgba(252,212,64,.3)");
-        grd.addColorStop(.8, "rgba(252,212,64,.1)");
         grd.addColorStop(1, "rgba(252,212,64,0)");
 
         ctx.fillStyle = grd;
         ctx.globalAlpha = alpha;
         ctx.beginPath();
-        ctx.arc(0, 0, 800, 0, Math.PI*2);
+        ctx.arc(0, 0, 600, 0, Math.PI*2);
         //ctx.rect(0,0,WIDTH,HEIGHT);
         ctx.fill();
 
@@ -458,12 +454,8 @@
          SUN_RADIUS * 2,
          SUN_RADIUS * 2);*/
 
-        var grd = ctx.createRadialGradient(0,0,25,0,0,400);
+        var grd = ctx.createRadialGradient(0,0,25,0,0,300);
         grd.addColorStop(0, "rgba(255,255,255,1)");
-        grd.addColorStop(.2, "rgba(245,243,206,.8)");
-        grd.addColorStop(.4, "rgba(245,243,206,.6)");
-        grd.addColorStop(.6, "rgba(245,243,206,.3)");
-        grd.addColorStop(.8, "rgba(245,243,206,.1)");
         grd.addColorStop(1, "rgba(245,243,206,0)");
 
         ctx.globalAlpha = alpha;
