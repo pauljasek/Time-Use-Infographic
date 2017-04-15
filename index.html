@@ -49,11 +49,11 @@
     var angles = [];
     var alphas = [];
 
-    var statistics;
+    var baseStatistics;
 
     if (false)
     {
-        statistics = [
+        baseStatistics = [
             ["Time", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
             ["Personal care", 1, 1, 1, 1, 2, 4, 10, 11, 9, 6, 5, 3, 3, 2, 2, 2, 2, 3, 3, 3, 4, 5, 5, 3],
             ["Sleeping", 85, 92, 94, 95, 92, 85, 66, 42, 25, 14, 7, 5, 3, 4, 4, 4, 4, 3, 3, 3, 5, 16, 40, 68],
@@ -70,7 +70,7 @@
     }
     else
     {
-        statistics = [
+        baseStatistics = [
             ["time", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
             ["eating and drinking", 6, 3, 3, 3, 5, 12, 32, 62, 73, 67, 53, 62, 162, 110, 61, 44, 48, 91, 155, 139, 87, 45, 21, 10],
             ["buying goods/services", 2, 1, 1, 1, 1, 2, 4, 9, 21, 39, 58, 71, 79, 75, 72, 72, 68, 64, 53, 38, 27, 15, 8, 4],
@@ -86,13 +86,15 @@
         ];
     }
 
+    var statistics = baseStatistics.slice();
     var AMOUNT = 100;
 
-    for (var i = 1; i < statistics.length; i++)
+    for (var i = 1; i < baseStatistics.length; i++)
     {
-        for (var j = 1; j < statistics[i].length; j++)
+        statistics[i] = statistics[i].slice();
+        for (var j = 1; j < baseStatistics[i].length; j++)
         {
-            statistics[i][j] = Math.round(statistics[i][j] * AMOUNT / 1000);
+            statistics[i][j] = Math.round(baseStatistics[i][j] * AMOUNT / 1000);
         }
     }
 
@@ -307,6 +309,95 @@
         }, false);
     }
 
+    function updateAmount(amount)
+    {
+        AMOUNT = amount;
+
+        for (var i = 1; i < baseStatistics.length; i++)
+        {
+            for (var j = 1; j < baseStatistics[i].length; j++)
+            {
+                statistics[i][j] = Math.round(baseStatistics[i][j] * AMOUNT / 1000);
+
+            }
+        }
+
+        for (var j = 1; j < baseStatistics[0].length; j++)
+        {
+            var max = 1;
+            var total = 0;
+
+            for (var i = 1; i < baseStatistics.length; i++)
+            {
+                total += statistics[i][j];
+                if (statistics[i][j] > statistics[max][j])
+                {
+                    max = i;
+                }
+            }
+            statistics[max][j] += AMOUNT-total;
+        }
+
+        person.radius = Math.sqrt(1000/AMOUNT) * 2 + 1;
+
+        var previousHour = Math.floor(time/60);
+        var nextHour = Math.ceil(time/60);
+        if (nextHour >= 24)
+        {
+            nextHour = 0;
+        }
+        var transition = time/60 - previousHour;
+
+        for (var i = 0; i < areas.length; i++)
+        {
+            var previousHourPeople = statistics[i+1][1 + previousHour];
+            var nextHourPeople = statistics[i+1][1 + nextHour];
+
+            var targetPeople = previousHourPeople + (nextHourPeople - previousHourPeople) * transition;
+            targetPeople = Math.round(targetPeople);
+            areas[i].targetPeople = targetPeople;
+            areas[i].people = 0;
+        }
+
+        circleCanvases = [];
+        var testPerson = Object.create(person);
+        testPerson.x = testPerson.radius;
+        testPerson.y = testPerson.radius;
+        for (var i = 0; i < areas.length; i++)
+        {
+            testPerson.location = i;
+            // Create a canvas element
+            var newCanvas = document.createElement('canvas');
+            newCanvas.width = person.radius * 2;
+            newCanvas.height = person.radius * 2;
+
+            // Get the drawing context
+            var newCtx = newCanvas.getContext('2d');
+            drawPerson(testPerson, newCtx);
+
+            circleCanvases.push(newCanvas);
+        }
+
+        people = [];
+        for (var i = 0; i < areas.length; i++)
+        {
+            var newArea = areas[i];
+            for (var j = 0; j < newArea.targetPeople; j++) {
+                var newPerson = Object.create(person);
+                newPerson.location = i;
+                newPerson.x = newArea.x;
+                newPerson.y = newArea.y;
+                newPerson.x += Math.random() * 10 - 5;
+                newPerson.y += Math.random() * 10 - 5;
+                newArea.people += 1;
+                people.push(newPerson);
+            }
+        }
+
+    }
+
+    updateAmount(AMOUNT);
+
 
     function drawArc(a1, a2, color, border, alpha) {
         ctx.save();
@@ -454,7 +545,7 @@
          SUN_RADIUS * 2,
          SUN_RADIUS * 2);*/
 
-        var grd = ctx.createRadialGradient(0,0,0,0,0,300);
+        var grd = ctx.createRadialGradient(0,0,100,0,0,300);
         grd.addColorStop(0, "rgba(255,255,255,1)");
         grd.addColorStop(1, "rgba(245,243,206,0)");
 
@@ -481,9 +572,9 @@
         ctx.restore();
     }
 
-    function drawPersonFast(person)
+    function drawPersonFast(p)
     {
-        ctx.drawImage(circleCanvases[person.location], person.x-person.radius, person.y-person.radius);
+        ctx.drawImage(circleCanvases[p.location], p.x-person.radius, p.y-person.radius);
     }
 
     function blockCircle(c1, c2)
@@ -493,7 +584,7 @@
 
         var totalHalfWidths = c1.radius + c2.radius;
 
-        var magnitude = Math.sqrt(vx*vx + vy*vy) + .1;
+        var magnitude = Math.sqrt(vx*vx + vy*vy);
 
         var hit = false;
 
@@ -503,8 +594,15 @@
 
             overlap = totalHalfWidths - magnitude;
 
-            dx = vx / magnitude;
-            dy = vy / magnitude;
+            if (magnitude != 0) {
+                dx = vx / magnitude;
+                dy = vy / magnitude;
+            }
+            else
+            {
+                dx = 1;
+                dy = 0;
+            }
 
             c1.x += dx * overlap;
             c1.y += dy * overlap;
@@ -654,8 +752,17 @@
                 }
             }
 
+            //var dx = areas[people[i].location].x - people[i].x;
+            //var dy = areas[people[i].location].y - people[i].y;
+
+            //var mag = Math.sqrt(dx * dx + dy * dy) - areas[people[i].location].radius;
+
+            //people[i].vx += dx / 100;
+            //people[i].vy += dy / 100;
+
             people[i].vx += (areas[people[i].location].x - people[i].x)/100;
             people[i].vy += (areas[people[i].location].y - people[i].y)/100;
+
 
             people[i].vx += 1 * (Math.random() - .5);
             people[i].vy += 1 * (Math.random() - .5);
@@ -673,11 +780,10 @@
                 }
             }
             for (var j = 0; j < areas.length; j++) {
-                if (j != i)
-                {
-                    blockCircle(people[i], areas[j]);
-                }
+                blockCircle(people[i], areas[j]);
             }
+
+
             //drawPerson(people[i], ctx);
             drawPersonFast(people[i]);
             //people.push(people.shift());
