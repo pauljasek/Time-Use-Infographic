@@ -475,8 +475,10 @@
     var mouseDown = false;
 
     canvas.addEventListener("mousemove", function (e) {
-        x = e.clientX * HEIGHT/window.innerHeight;
-        y = e.clientY * HEIGHT/window.innerHeight;
+        var rect = canvas.getBoundingClientRect();
+
+        x = (e.clientX - rect.left) * HEIGHT/window.innerHeight;
+        y = (e.clientY - rect.top) * HEIGHT/window.innerHeight;
     },false);
 
     canvas.addEventListener("mousedown", function (e) {
@@ -909,7 +911,7 @@
             ctx.drawImage(imageDict[area.name], -19, -34, 38, 38);
 
             ctx.globalAlpha = 1;
-            drawText(0, 15, roundedPercentage + "%", "#000", "bolder 16pt Verdana", true, true, "#FFF");
+            drawText(0, 15, roundedPercentage + "%", "#000", "bolder 16pt Verdana", true);///, true, "#FFF");
         }
         else
         {
