@@ -68,7 +68,10 @@
     var WIDTH = 1536;
     var HEIGHT = 734;
 
+    var SETTINGS_OFFSET = 130;
+
     var CONTROLSUN = false;
+    var SHOWSTATISTICS = false;
 
     var canvas = document.getElementById("main_canvas");
     document.body.style.backgroundColor = "#000";
@@ -93,7 +96,7 @@
         ["buying goods/services", 2, 1, 1, 1, 1, 2, 4, 9, 21, 39, 58, 71, 79, 75, 72, 72, 68, 64, 53, 38, 27, 15, 8, 4],
         ["other", 7, 3, 2, 2, 3, 4, 8, 15, 19, 21, 24, 25, 23, 24, 25, 27, 26, 25, 23, 24, 26, 25, 20, 11],
         ["caring for others", 5, 3, 3, 2, 5, 5, 17, 41, 42, 36, 35, 36, 35, 35, 41, 54, 59, 60, 55, 56, 57, 43, 20, 9],
-        ["household", 7, 3, 2, 3, 8, 17, 44, 77, 104, 130, 141, 140, 131, 122, 117, 117, 131, 149, 141, 110, 76, 50, 28, 13],
+        ["household activities", 7, 3, 2, 3, 8, 17, 44, 77, 104, 130, 141, 140, 131, 122, 117, 117, 131, 149, 141, 110, 76, 50, 28, 13],
         ["leisure and sports", 89, 45, 25, 16, 16, 27, 51, 85, 113, 150, 181, 195, 198, 231, 261, 286, 310, 323, 363, 450, 528, 526, 389, 203],
         ["sleeping", 844, 915, 943, 951, 916, 851, 657, 425, 248, 137, 75, 49, 35, 41, 44, 42, 37, 29, 25, 30, 55, 159, 399, 676],
         ["personal care", 13, 7, 5, 7, 22, 40, 102, 106, 84, 63, 48, 34, 29, 23, 21, 22, 25, 29, 29, 29, 39, 51, 52, 31],
@@ -121,7 +124,7 @@
         "working": "working.png",
         "educational activities": "education.png",
         "caring for others": "caringforothers.png",
-        "household": "household.png",
+        "household activities": "household.png",
         "leisure and sports": "leisure.png",
         "buying goods/services": "shopping.png",
         "organizational/religious": "organization.png",
@@ -169,8 +172,10 @@
         hovered: false,
         hoverRange: 1.25,
         changed: false,
+        waitForInput: true,
         color: "#FFF",
         displayValue: false,
+        enabled: true,
         value: function()
         {
             return this.position * (this.maxVal - this.minVal) + this.minVal;
@@ -182,12 +187,17 @@
         draw: function(ctx)
         {
             ctx.save();
-            ctx.strokeStyle = "#FFF";
+            ctx.strokeStyle = this.color;
             ctx.globalAlpha = 0.5;
             ctx.lineWidth = 3;
             if (this.hovered)
             {
                 ctx.globalAlpha = 0.95;
+            }
+
+            if (!this.enabled) {
+                ctx.strokeStyle = "#999";
+                ctx.globalAlpha = 0.5;
             }
             ctx.beginPath();
             ctx.moveTo(this.x, this.y + this.height/2);
@@ -200,9 +210,119 @@
             ctx.lineTo(this.x + this.position * this.width, this.y + this.height);
             ctx.stroke();
 
-            if (this.displayValue) {
-                drawText(this.x + this.position * this.width, this.y + this.height + 15, this.value().toString(), "#FFF", "12pt Arial", true);
+            if (this.enabled) {
+
+                if (this.displayValue) {
+                    drawText(this.x + this.position * this.width, this.y + this.height + 15, this.value().toString(), "#FFF", "12pt Calibri", true);
+                }
             }
+
+            ctx.restore();
+        },
+        update: function(mx, my, mouseDown)
+        {
+            if (this.enabled) {
+                this.hovered = Math.abs(this.x + this.width / 2 - mx) < this.width * this.hoverRange / 2
+                        && Math.abs(this.y + this.height / 2 - my) < this.height * this.hoverRange / 2;
+                if (mouseDown && this.hovered) {
+                    this.position = Math.min(1, Math.max((mx - this.x) / this.width, 0));
+                    if (!this.waitForInput) {
+                        this.action();
+                    }
+                    this.changed = true;
+                }
+                else if (this.changed) {
+                    this.action();
+                    this.changed = false;
+                }
+
+                if (this.precision < 0) {
+                    this.position = this.getPosition(Math.round(this.value() * Math.pow(10, this.precision)) * Math.pow(10, -this.precision));
+                }
+                else {
+                    this.position = this.getPosition(this.value().toFixed(this.precision));
+                }
+            }
+        },
+        action: function() {}
+    }
+
+    var sliders = [];
+
+    var amountSlider = Object.create(slider);
+    amountSlider.x = 20;
+    amountSlider.y = 380 + SETTINGS_OFFSET;
+    amountSlider.width = 150;
+    amountSlider.height = 35;
+    amountSlider.minVal = 100;
+    amountSlider.maxVal = 1000;
+    amountSlider.precision = -1;
+    amountSlider.position = amountSlider.getPosition(100);
+    amountSlider.displayValue = true;
+    amountSlider.waitForInput = true;
+    amountSlider.action = function() {
+        updateAmount(this.value());
+    }
+    sliders.push(amountSlider);
+
+    var SUNSPEED = 60;
+
+    var timeSpeedSlider = Object.create(slider);
+    timeSpeedSlider.x = 20;
+    timeSpeedSlider.y = 240 + SETTINGS_OFFSET;
+    timeSpeedSlider.width = 150;
+    timeSpeedSlider.height = 35;
+    timeSpeedSlider.minVal = 0;
+    timeSpeedSlider.maxVal = 120;
+    timeSpeedSlider.precision = 1;
+    timeSpeedSlider.position = timeSpeedSlider.getPosition(60);
+    timeSpeedSlider.displayValue = false;
+    timeSpeedSlider.waitForInput = false;
+    timeSpeedSlider.action = function() {
+        SUNSPEED = this.value();
+    }
+    sliders.push(timeSpeedSlider);
+
+    var checkbox = {
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+        hovered: false,
+        hoverRange: 1,
+        checked: false,
+        pressed: false,
+        color: "#FFF",
+        value: function()
+        {
+            return this.position * (this.maxVal - this.minVal) + this.minVal;
+        },
+        getPosition: function(val)
+        {
+            return (val - this.minVal)/(this.maxVal - this.minVal);
+        },
+        draw: function(ctx)
+        {
+            ctx.save();
+            ctx.strokeStyle = this.color;
+            ctx.globalAlpha = 0.5;
+            ctx.lineWidth = 3;
+            if (this.hovered)
+            {
+                ctx.globalAlpha = 0.80;
+            }
+            if (this.pressed)
+            {
+                ctx.globalAlpha = 1.0;
+            }
+            if (this.checked)
+            {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x + 4, this.y + 4, this.width - 8, this.height - 8);
+            }
+            ctx.beginPath();
+            ctx.rect(this.x, this.y, this.width, this.height);
+            ctx.stroke();
 
             ctx.restore();
         },
@@ -212,59 +332,45 @@
                     && Math.abs(this.y + this.height/2 - my) < this.height * this.hoverRange/2;
             if (mouseDown && this.hovered)
             {
-                this.position = Math.min(1,Math.max((mx - this.x)/this.width,0));
-                this.changed = true;
+                this.pressed = true;
             }
-            else if (this.changed)
+            if (!mouseDown)
             {
-                this.action();
-                this.changed = false;
-            }
-
-            if (this.precision < 0)
-            {
-                this.position = this.getPosition(Math.round(this.value() * Math.pow(10, this.precision)) * Math.pow(10, -this.precision));
-            }
-            else {
-                this.position = this.getPosition(this.value().toFixed(this.precision));
+                if (this.hovered && this.pressed)
+                {
+                    this.checked = !this.checked;
+                    this.action();
+                }
+                this.pressed = false;
             }
         },
         action: function() {}
     }
 
-    var sliders = [];
+    var checkboxes = [];
 
-    var amountSlider = Object.create(slider);
-    amountSlider.x = 25;
-    amountSlider.y = 100;
-    amountSlider.width = 150;
-    amountSlider.height = 35;
-    amountSlider.minVal = 100;
-    amountSlider.maxVal = 1000;
-    amountSlider.precision = -1;
-    amountSlider.position = amountSlider.getPosition(100);
-    amountSlider.displayValue = true;
-    amountSlider.action = function() {
-        updateAmount(this.value());
-    }
-    sliders.push(amountSlider);
+    var mouseControlCheckBox = Object.create(checkbox);
+    mouseControlCheckBox.x = 150;
+    mouseControlCheckBox.y = 290 + SETTINGS_OFFSET;
+    mouseControlCheckBox.width = 20;
+    mouseControlCheckBox.height = 20;
+    mouseControlCheckBox.action = function() {
+        CONTROLSUN = this.checked;
+        timeSpeedSlider.enabled = !this.checked;
+    };
 
-    var SUNSPEED = 60;
+    checkboxes.push(mouseControlCheckBox);
 
-    var timeSpeedSlider = Object.create(slider);
-    timeSpeedSlider.x = 25;
-    timeSpeedSlider.y = 200;
-    timeSpeedSlider.width = 150;
-    timeSpeedSlider.height = 35;
-    timeSpeedSlider.minVal = 0;
-    timeSpeedSlider.maxVal = 120;
-    timeSpeedSlider.precision = 1;
-    timeSpeedSlider.position = timeSpeedSlider.getPosition(60);
-    timeSpeedSlider.displayValue = false;
-    timeSpeedSlider.action = function() {
-        SUNSPEED = this.value();
-    }
-    sliders.push(timeSpeedSlider);
+    var showStatisticsCheckBox = Object.create(checkbox);
+    showStatisticsCheckBox.x = 150;
+    showStatisticsCheckBox.y = 490 + SETTINGS_OFFSET;
+    showStatisticsCheckBox.width = 20;
+    showStatisticsCheckBox.height = 20;
+    showStatisticsCheckBox.action = function() {
+        SHOWSTATISTICS = this.checked;
+    };
+
+    checkboxes.push(showStatisticsCheckBox);
 
     var people = [];
 
@@ -312,7 +418,7 @@
 
     window.onload = window.onresize = function(event)
     {
-        canvas.width = Math.max(window.innerWidth, (HEIGHT + 200) * window.innerHeight/HEIGHT);
+        canvas.width = Math.max(window.innerWidth, (HEIGHT + 250) * window.innerHeight/HEIGHT);
         canvas.height = window.innerHeight;
 
         WIDTH = HEIGHT * canvas.width/canvas.height;
@@ -571,7 +677,7 @@
         ctx.restore();
     }
 
-    function drawText(x, y, text, color, font, centered)
+    function drawText(x, y, text, color, font, centered, stroke, strokeColor)
     {
         ctx.save();
         ctx.fillStyle = color;
@@ -582,6 +688,12 @@
             ctx.textBaseline = "middle";
         }
         ctx.fillText(text, x, y);
+        if (stroke)
+        {
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 1;
+            ctx.strokeText(text, x, y);
+        }
         ctx.restore();
     }
 
@@ -638,6 +750,14 @@
         grd.addColorStop(1, "rgba(150,150,150,0)");
         ctx.fillStyle = grd;
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        lgrd=ctx.createLinearGradient(0,0,380,0);
+        lgrd.addColorStop(0,"rgba(0,0,0,1)");
+        lgrd.addColorStop(1,"rgba(0,0,0,0)");
+
+        ctx.fillStyle=lgrd;
+        ctx.globalAlpha = alpha;
+        ctx.fillRect(0, 0, 380, HEIGHT);
 
         ctx.restore();
     }
@@ -768,7 +888,10 @@
             ctx.globalAlpha = .9;
         }
 
-        ctx.fillStyle = "rgba(230,230,230,1)";
+        var percentage = (area.people) / AMOUNT;
+        var roundedPercentage = Math.round(percentage * 100);
+
+        ctx.fillStyle = "rgba(210,210,210,1)";
         ctx.beginPath();
         ctx.arc(0, 0, area.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -776,10 +899,23 @@
         ctx.fillStyle = colors[area.number];
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.arc(0, 0, area.radius - 4, -Math.PI/2, (area.people) / AMOUNT * Math.PI * 2 - Math.PI/2);
+        ctx.arc(0, 0, area.radius - 3, -Math.PI/2, percentage * Math.PI * 2 - Math.PI/2);
         ctx.fill();
 
-        ctx.drawImage(imageDict[area.name], -27, -27, 54, 54);
+        if (!area.hovered) {
+            ctx.globalAlpha = .7;
+        }
+        if (SHOWSTATISTICS) {
+            ctx.drawImage(imageDict[area.name], -19, -34, 38, 38);
+
+            ctx.globalAlpha = 1;
+            drawText(0, 15, roundedPercentage + "%", "#000", "bolder 16pt Verdana", true, true, "#FFF");
+        }
+        else
+        {
+            ctx.drawImage(imageDict[area.name], -27, -27, 54, 54);
+        }
+
 
         ctx.restore();
     }
@@ -798,7 +934,7 @@
 
         ctx.restore();
 
-        drawText(WIDTH/2, HEIGHT/2 - 60, areas[hoveredArea].name, "#FFF", "16pt Arial", true);
+        drawText(WIDTH/2, HEIGHT/2 - 60, areas[hoveredArea].name, "#FFF", "16pt Calibri", true);
     }
 
     function update()
@@ -974,8 +1110,36 @@
             sliders[i].update(x, y, mouseDown);
             sliders[i].draw(ctx);
         }
+
+        for (var i = 0; i < checkboxes.length; i++)
+        {
+            checkboxes[i].update(x, y, mouseDown);
+            checkboxes[i].draw(ctx);
+        }
         //drawText(WIDTH/2, 50, "How We Spend Our Time", "#FFF", "36pt Arial", true);
         drawText(WIDTH/2, 45, hourText + ":" + minuteText + " " + ampmText, "#FFF", "32pt Courier New", true);
+        drawText(10, 45, "How We Spend Our Time", "#FFF", "24pt Calibri", false);
+
+        drawText(10, 90, "Each colored dot represents a person", "#FFF", "14pt Calibri", false);
+        drawText(10, 115, "spending time throughout the day.", "#FFF", "14pt Calibri", false);
+
+        drawText(10, 165 + SETTINGS_OFFSET, "Settings", "#FFF", "16pt Calibri", false);
+
+
+        drawText(10, 195 + SETTINGS_OFFSET, "How time passes:", "#FFF", "14pt Calibri", false);
+        drawText(95, 220 + SETTINGS_OFFSET, "speed:", "#FFF", "14pt Calibri", true);
+        drawText(10, 305 + SETTINGS_OFFSET, "mouse control:", "#FFF", "14pt Calibri", false);
+
+
+        drawText(10, 360 + SETTINGS_OFFSET, "The amount of people:", "#FFF", "14pt Calibri", false);
+
+
+        drawText(10, 475 + SETTINGS_OFFSET, "Show quantitative activity", "#FFF", "14pt Calibri", false);
+        drawText(10, 505 + SETTINGS_OFFSET, "percentages:", "#FFF", "14pt Calibri", false);
+
+
+        //drawText(WIDTH/2, HEIGHT/2, hourText + ":" + minuteText + " " + ampmText, "#FFF", "32pt Courier New", true);
+
 
         if (time >= 24*60 - 1)
         {
