@@ -265,7 +265,7 @@
 
     var amountSlider = Object.create(slider);
     amountSlider.x = 20;
-    amountSlider.y = 380 + SETTINGS_OFFSET;
+    amountSlider.y = 410 + SETTINGS_OFFSET;
     amountSlider.width = 150;
     amountSlider.height = 35;
     amountSlider.minVal = 100;
@@ -303,7 +303,7 @@
         width: 50,
         height: 50,
         hovered: false,
-        hoverRange: 1,
+        hoverRange: 1.25,
         checked: false,
         pressed: false,
         color: "#FFF",
@@ -365,7 +365,7 @@
 
     var mouseControlCheckBox = Object.create(checkbox);
     mouseControlCheckBox.x = 150;
-    mouseControlCheckBox.y = 290 + SETTINGS_OFFSET;
+    mouseControlCheckBox.y = 320 + SETTINGS_OFFSET;
     mouseControlCheckBox.width = 20;
     mouseControlCheckBox.height = 20;
     mouseControlCheckBox.action = function() {
@@ -377,7 +377,7 @@
 
     var showStatisticsCheckBox = Object.create(checkbox);
     showStatisticsCheckBox.x = 150;
-    showStatisticsCheckBox.y = 490 + SETTINGS_OFFSET;
+    showStatisticsCheckBox.y = 530 + SETTINGS_OFFSET;
     showStatisticsCheckBox.width = 20;
     showStatisticsCheckBox.height = 20;
     showStatisticsCheckBox.action = function() {
@@ -1088,15 +1088,15 @@
             //people[i].vx += dx / 100;
             //people[i].vy += dy / 100;
 
-            people[i].vx += (areas[people[i].location].x - people[i].x)/100;
-            people[i].vy += (areas[people[i].location].y - people[i].y)/100;
+            people[i].vx += (areas[people[i].location].x - people[i].x)/50;
+            people[i].vy += (areas[people[i].location].y - people[i].y)/50;
 
 
             people[i].vx += 1 * (Math.random() - .5);
             people[i].vy += 1 * (Math.random() - .5);
 
-            people[i].vx *= .8;
-            people[i].vy *= .8;
+            people[i].vx *= .7;
+            people[i].vy *= .7;
 
             people[i].x += people[i].vx;
             people[i].y += people[i].vy;
@@ -1178,19 +1178,26 @@
         drawText(10, 90, "Each colored dot represents a person", "#FFF", "14pt Calibri", false);
         drawText(10, 115, "spending time throughout the day.", "#FFF", "14pt Calibri", false);
 
-        drawText(10, 165 + SETTINGS_OFFSET, "Settings", "#FFF", "16pt Calibri", false);
+        drawText(10, 160, "The represented population is US", "#FFF", "14pt Calibri", false);
+        drawText(10, 185, "civilians over the age of 15.", "#FFF", "14pt Calibri", false);
 
 
-        drawText(10, 195 + SETTINGS_OFFSET, "How time passes:", "#FFF", "14pt Calibri", false);
-        drawText(95, 220 + SETTINGS_OFFSET, "speed:", "#FFF", "14pt Calibri", true);
-        drawText(10, 305 + SETTINGS_OFFSET, "mouse control:", "#FFF", "14pt Calibri", false);
+        drawText(10, 165 + SETTINGS_OFFSET, "Settings", "#FFF", "bold 16pt Calibri", false);
 
 
-        drawText(10, 360 + SETTINGS_OFFSET, "The amount of people:", "#FFF", "14pt Calibri", false);
+        drawText(10, 195 + SETTINGS_OFFSET, "How time passes:", "#FFF", "bold 14pt Calibri", false);
+        drawText(10, 235 + SETTINGS_OFFSET, "Slow", "#FFF", "14pt Calibri", false);
+        drawText(150, 235 + SETTINGS_OFFSET, "Fast", "#FFF", "14pt Calibri", false);
+        drawText(10, 305 + SETTINGS_OFFSET, "Control time of day with", "#FFF", "14pt Calibri", false);
+        drawText(10, 335 + SETTINGS_OFFSET, "cursor position: ", "#FFF", "14pt Calibri", false);
+
+        drawText(10, 390 + SETTINGS_OFFSET, "The amount of people:", "#FFF", "bold 14pt Calibri", false);
 
 
-        drawText(10, 475 + SETTINGS_OFFSET, "Show quantitative activity", "#FFF", "14pt Calibri", false);
-        drawText(10, 505 + SETTINGS_OFFSET, "percentages:", "#FFF", "14pt Calibri", false);
+        drawText(10, 490 + SETTINGS_OFFSET, "Data:", "#FFF", "bold 14pt Calibri", false);
+
+        drawText(10, 515 + SETTINGS_OFFSET, "Show quantitative activity", "#FFF", "14pt Calibri", false);
+        drawText(10, 545 + SETTINGS_OFFSET, "percentages:", "#FFF", "14pt Calibri", false);
 
 
         //drawText(WIDTH/2, HEIGHT/2, hourText + ":" + minuteText + " " + ampmText, "#FFF", "32pt Courier New", true);
