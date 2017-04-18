@@ -838,12 +838,12 @@
         ctx.fillStyle = grd;
         ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-        lgrd=ctx.createLinearGradient(0,0,380,0);
+        lgrd=ctx.createLinearGradient(0,0,450,0);
         lgrd.addColorStop(0,"rgba(0,0,0,1)");
         lgrd.addColorStop(1,"rgba(0,0,0,0)");
         ctx.fillStyle=lgrd;
         ctx.globalAlpha = alpha;
-        ctx.fillRect(0, 0, 380, HEIGHT);
+        ctx.fillRect(0, 0, 450, HEIGHT);
 
         ctx.restore();
     }
