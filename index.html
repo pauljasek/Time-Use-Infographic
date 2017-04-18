@@ -165,8 +165,9 @@
         ],
         "Organizational/Religious": [
             "This activity entails going to the place of worship,",
-            "praying, and outside service projects that are funded",
-            "or for a person’s specific place of worship."
+            "praying, or for a person’s specific place of worship.",
+            "It also includes civic or organizational volunteer",
+            "work."
         ],
         "Leisure and Sports": [
             "The most popular sports played in the United States",
@@ -492,7 +493,7 @@
 
     window.onload = window.onresize = function(event)
     {
-        canvas.width = Math.max(document.body.clientWidth, (HEIGHT + 250) * document.body.clientHeight/HEIGHT);
+        canvas.width = Math.max(document.body.clientWidth, (HEIGHT + 290) * document.body.clientHeight/HEIGHT);
         canvas.height = document.body.clientHeight;
 
         WIDTH = HEIGHT * canvas.width/canvas.height;
@@ -512,12 +513,12 @@
     var colors = [];
     for (var i = 0; i < areas_length; i++)
     {
-        var hue = Math.round(i/areas_length * 360 + 30);
+        var hue = Math.round(i/areas_length * 360 + 28);
         if (hue < 0)
         {
             hue += 360;
         }
-        colors.push("hsl(" + hue + ", 100%, 50%)");
+        colors.push("hsl(" + hue + ", 95%, 55%)");
     }
 
     var circleCanvases = [];
@@ -777,7 +778,7 @@
         if (stroke)
         {
             ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = .3;
             ctx.strokeText(text, x, y);
         }
         ctx.restore();
@@ -1158,8 +1159,8 @@
             people[i].vx += 1 * (Math.random() - .5);
             people[i].vy += 1 * (Math.random() - .5);
 
-            people[i].vx *= .7;
-            people[i].vy *= .7;
+            people[i].vx *= .75;
+            people[i].vy *= .75;
 
             people[i].x += people[i].vx;
             people[i].y += people[i].vy;
@@ -1235,8 +1236,8 @@
             checkboxes[i].draw(ctx);
         }
         //drawText(WIDTH/2, 50, "How We Spend Our Time", "#FFF", "36pt Arial", true);
-        drawText(WIDTH/2, 45, hourText + ":" + minuteText + " " + ampmText, "#FFF", "bolder 32pt Courier New", true);
-        drawText(10, 45, "How We Spend Our Time", "#FFF", "bolder 24pt Calibri", false);
+        drawText(WIDTH/2, 35, hourText + ":" + minuteText + " " + ampmText, "#FFF", "bolder 32pt Courier New", true);
+        drawText(10, 45, "How We Spend Our Time", "#FFF", "bolder 28pt Calibri", false);
 
         drawText(10, 90, "Each colored dot represents a person", "#FFF", "14pt Calibri", false);
         drawText(10, 115, "spending time throughout the day.", "#FFF", "14pt Calibri", false);
